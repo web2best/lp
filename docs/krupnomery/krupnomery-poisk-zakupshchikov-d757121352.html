@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Поиск закупщиков крупномеров</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,500;7..72,600&family=Onest:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one calm reading column, like a printed proposal; the morning card is the only "screen" on the page */
+:root {
+  --bg: #f3f6f2;
+  --surface: #ffffff;
+  --ink: #17201b;
+  --muted: #56645b;
+  --line: #d6dfd8;
+  --accent: #1d6a49;
+  --accent-soft: #e1eee5;
+  --display: "Literata", Georgia, "Times New Roman", serif;
+  --body: "Onest", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f1511; --surface: #161e19; --ink: #e5ece7; --muted: #9aa89f;
+    --line: #27332b; --accent: #6cc39a; --accent-soft: #1a2c22; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f1511; --surface: #161e19; --ink: #e5ece7; --muted: #9aa89f;
+  --line: #27332b; --accent: #6cc39a; --accent-soft: #1a2c22; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; -webkit-text-size-adjust: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.6 var(--body);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.page { max-width: 780px; margin: 0 auto; padding-block: 40px 56px; display: grid; gap: 44px; }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 2px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+p { margin: 0; }
+.plate { font: 500 12px/1.4 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+header { display: grid; gap: 14px; }
+h1 { font: 600 clamp(30px, 5.4vw, 46px)/1.1 var(--display); letter-spacing: -.01em; }
+.sub { font-size: 19px; line-height: 1.45; color: var(--ink); max-width: 36em; }
+.meta { font: 400 13px/1.5 var(--mono); color: var(--muted); }
+.lead { max-width: 40em; }
+
+.brief { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.brief > div { padding: 18px 20px; display: grid; gap: 6px; align-content: start; min-width: 0; border-top: 1px solid var(--line); }
+.brief > div:first-child { border-top: 0; }
+@media (min-width: 700px) {
+  .brief > div { border-top: 0; border-left: 1px solid var(--line); }
+  .brief > div:first-child { border-left: 0; }
+}
+.label { font: 500 11.5px/1.4 var(--mono); letter-spacing: .07em; text-transform: uppercase; color: var(--muted); }
+.big { font: 600 22px/1.25 var(--display); font-variant-numeric: tabular-nums; }
+
+section { display: grid; gap: 16px; }
+h2 { font: 600 25px/1.25 var(--display); display: flex; gap: 12px; align-items: baseline; }
+h2 .n { font: 500 15px/1 var(--mono); color: var(--accent); min-width: 1.4em; }
+h3 { font: 600 17px/1.35 var(--body); }
+ul, ol { margin: 0; padding-left: 1.25em; display: grid; gap: 8px; }
+li { padding-left: .2em; }
+.note { background: var(--accent-soft); border-radius: 10px; padding: 16px 18px; }
+.note strong { font-weight: 600; }
+.small { font-size: 14px; color: var(--muted); }
+
+.steps { list-style: none; padding: 0; counter-reset: s; gap: 12px; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 2em 1fr; gap: 10px; padding: 0; }
+.steps li::before { content: counter(s); font: 500 14px/1.7 var(--mono); color: var(--accent); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.card-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; padding: 12px 18px; border-bottom: 1px solid var(--line); font: 400 13px/1.4 var(--mono); color: var(--muted); }
+.score { color: var(--accent); font-weight: 500; }
+.card dl { margin: 0; padding: 6px 18px 14px; display: grid; }
+.card dl > div { display: grid; grid-template-columns: 9.5em 1fr; gap: 4px 16px; padding: 10px 0; border-top: 1px solid var(--line); }
+.card dl > div:first-child { border-top: 0; }
+.card dt { font: 500 12px/1.6 var(--mono); letter-spacing: .04em; text-transform: uppercase; color: var(--muted); }
+.card dd { margin: 0; min-width: 0; }
+@media (max-width: 520px) { .card dl > div { grid-template-columns: 1fr; } }
+
+.stages { display: grid; }
+.stage { display: grid; gap: 8px; padding: 18px 0; border-top: 1px solid var(--line); }
+.stage:last-child { border-bottom: 1px solid var(--line); }
+.done { display: grid; gap: 2px; font-size: 15px; }
+.done .label { color: var(--accent); }
+
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-top: 1px solid var(--line); }
+thead th { border-top: 0; font: 500 11.5px/1.4 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+td.num, th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.when { white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr.total { background: var(--accent-soft); }
+tr.total td { font-weight: 600; }
+@media (max-width: 600px) {
+  table.price { min-width: 0; }
+  table.price thead { display: none; }
+  table.price tr { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 14px; border-top: 1px solid var(--line); }
+  table.price tbody tr:first-child { border-top: 0; }
+  table.price td { border: 0; padding: 0; }
+  table.price td:first-child { grid-column: 1; grid-row: 1; font-weight: 600; }
+  table.price td.cost { grid-column: 2; grid-row: 1; }
+  table.price td:nth-child(2) { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+  table.price td.when { grid-column: 1; font-size: 14px; color: var(--muted); }
+  table.price td.hours { grid-column: 2; font-size: 14px; color: var(--muted); }
+}
+.risks td:first-child { width: 42%; }
+
+.sign { display: grid; gap: 4px; }
+footer { border-top: 1px solid var(--line); padding-top: 16px; font: 400 13px/1.5 var(--mono); color: var(--muted); }
+</style>
+
+</head>
+<body>
+<main class="page">
+  <header>
+    <p class="plate">web2best.com · Разработка · Веб &amp; мобильные</p>
+    <h1>Поиск закупщиков крупномеров</h1>
+    <p class="sub">ИИ-агент каждый день находит для питомника заказчиков в торгах, контрактах и новостройках Москвы и области</p>
+    <p class="meta">Для Василия · Предложение от 15 октября 2026 года</p>
+    <p class="lead">Пилот на 30 дней, с 19 октября по 17 ноября. Каждый рабочий день ваш менеджер получает сводку: кто сейчас покупает деревья, какие и сколько, что из этого есть у вас на складе, и готовый черновик КП. Решает, отправляет и звонит менеджер. ИИ только готовит.</p>
+  </header>
+
+  <div class="brief" aria-label="Коротко">
+    <div>
+      <p class="label">Что получаете</p>
+      <p>Сводку к 9:00 каждый рабочий день: заказчик, ведомость деревьев, оценка, черновик КП</p>
+    </div>
+    <div>
+      <p class="label">Что делаете вы</p>
+      <p>Даёте таблицу склада и прайс, менеджер разбирает сводку и связывается с заказчиками</p>
+    </div>
+    <div>
+      <p class="label">Сколько стоит</p>
+      <p class="big">174 000 ₽</p>
+      <p class="small">за пилот, оплата по этапам</p>
+    </div>
+  </div>
+
+  <section>
+    <h2><span class="n">1</span>Зачем</h2>
+    <p>Готовой базы «кто купит крупномеры» нет. Покупатель появляется как событие: подписан контракт на озеленение, открылась котировочная сессия на саженцы, новостройка подходит к сдаче. Таких событий много. Москва планирует высаживать около 8 тыс. крупномеров в год, в 2025 году высадили 10–12 тыс. В Подмосковье в 2026 году благоустраивают 425 дворов и 77 парков, скверов и набережных. В типовых ТЗ требуют материал из питомника, с комом или закрытой корневой системой, то есть ваш товар.</p>
+    <p>Чем раньше вы придёте к заказчику с расчётом по его ведомости, тем больше шансов стать поставщиком. Каждый день вручную отслеживать торги, контракты и стройки менеджер не успевает.</p>
+    <p class="note"><strong>Продаж не обещаем.</strong> Обещаем другое: каждый рабочий день сводку заказчиков с оценкой и черновиком КП, а через 30 дней отчёт о том, какие источники дали ответы и запросы расчёта.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">2</span>Как будет работать</h2>
+    <ol class="steps">
+      <li><span>Ночью агент проверяет открытые официальные источники: ЕИС, портал поставщиков Москвы, наш.дом.рф, открытые данные ФНС. ПИК ЕАСУЗ Московской области и B2B-Center подключаем после регистрации питомника.</span></li>
+      <li><span>Читает ТЗ и сметы в PDF, Excel и Word и выписывает ведомость: порода, высота, ком, количество, сроки, адрес.</span></li>
+      <li><span>Сверяет ведомость с вашим складом и ставит оценку от 0 до 100: чем больше деревьев с вашего склада, больше сумма и ближе объект, тем выше.</span></li>
+      <li><span>Пишет черновик КП на вашем бланке и только с вашими ценами.</span></li>
+      <li><span>К 9:00 сводка у менеджера на почте или в мессенджере. Дальше он решает сам.</span></li>
+    </ol>
+    <p class="small">Агент — собственная разработка web2best на Claude (Anthropic). Он работает на нашем сервере: ставить программы и заводить аккаунты вам не нужно.</p>
+
+    <article class="card" aria-label="Пример карточки из сводки">
+      <div class="card-top"><span>Сводка · вторник, 27 октября · условный пример</span><span class="score">оценка 82 из 100</span></div>
+      <dl>
+        <div><dt>Сигнал</dt><dd>В реестре контрактов ЕИС новый контракт на благоустройство дворов, г. о. Люберцы. Победитель — ООО «…».</dd></div>
+        <div><dt>Ведомость</dt><dd>Из сметы, стр. 14: ель колючая 3–3,5 м, ком — 24 шт. · сосна обыкновенная 3 м, ком — 12 шт. · туя «Смарагд» 2 м — 38 шт. · липа 4–5 м — 20 шт.</dd></div>
+        <div><dt>Склад</dt><dd>Закрываем 74 из 94 деревьев, липы нет. До объекта около 35 км.</dd></div>
+        <div><dt>Черновик КП</dt><dd>«По контракту № … поставим 74 из 94 деревьев по вашей ведомости: из питомника, с комом, с документами о происхождении».</dd></div>
+        <div><dt>Менеджеру</dt><dd>Проверить и до 29 октября отправить на официальный адрес компании. Контакт — по ссылке на контракт в ЕИС.</dd></div>
+      </dl>
+    </article>
+  </section>
+
+  <section>
+    <h2><span class="n">3</span>Что делаем</h2>
+    <div class="stages">
+      <div class="stage">
+        <h3>Этап 1. Торги</h3>
+        <p>Агент каждый день собирает закупки на посадку деревьев, озеленение и благоустройство в Москве и области: 44-ФЗ, 223-ФЗ, малые закупки портала Москвы. Лишнее отбрасывает: семена, рассаду, вырубку, обрезку.</p>
+        <p class="done"><span class="label">Этап сдан, когда</span><span>на контрольном списке из 20 закупок за последние 3 месяца агент находит не меньше 18, а лишних строк в первых сводках не больше 30 %.</span></p>
+      </div>
+      <div class="stage">
+        <h3>Этап 2. Разбор документации и оценка</h3>
+        <p>Из ТЗ и смет агент выписывает ведомость деревьев, начальную цену и обеспечение, сверяет со складом и ставит оценку.</p>
+        <p class="done"><span class="label">Этап сдан, когда</span><span>на 10 прошлых закупках позиции выписаны верно в 8 из 10, а оценка совпадает с решением вашего менеджера в 8 из 10.</span></p>
+      </div>
+      <div class="stage">
+        <h3>Этап 3. Черновики КП и ежедневная сводка</h3>
+        <p>Черновик КП на вашем бланке, позиции и цены только из вашего прайса. Сводка приходит каждый рабочий день к 9:00.</p>
+        <p class="done"><span class="label">Этап сдан, когда</span><span>в 10 черновиках нет ни одной выдуманной цены или позиции и ни одно письмо не ушло без человека.</span></p>
+      </div>
+      <div class="stage">
+        <h3>Этап 4. Победители контрактов, новостройки, ландшафтные компании</h3>
+        <p>Победители контрактов на озеленение как кандидаты на субподряд. Новостройки со сдачей через 3–12 месяцев по декларациям на наш.дом.рф. Ландшафтные компании Москвы и области из открытого реестра МСП. На каждую — карточка с открытыми контактами компании.</p>
+        <p class="done"><span class="label">Этап сдан, когда</span><span>готово 30 карточек, в 9 из 10 случайно выбранных данные совпадают с источником, дублей нет.</span></p>
+      </div>
+      <div class="stage">
+        <h3>Этап 5. Работа агента до конца пилота</h3>
+        <p>Сводка каждый рабочий день с 26 октября по 17 ноября, донастройка раз в неделю по ответам менеджера. В конце отчёт: сколько закупок найдено и оценено, сколько ушло в КП, сколько пришло ответов и запросов расчёта, какие источники сработали.</p>
+        <p class="done"><span class="label">Этап сдан, когда</span><span>нет ни одного пропущенного рабочего дня (пропуск закрываем в тот же день) и 17 ноября сдан отчёт.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">4</span>Сроки и стоимость</h2>
+    <div class="table-wrap">
+      <table class="price">
+        <thead><tr><th>Этап</th><th>Что получаете</th><th>Срок</th><th class="num">Часы</th><th class="num">Стоимость</th></tr></thead>
+        <tbody>
+          <tr><td>1. Торги</td><td>Ежедневный сбор и фильтр закупок</td><td class="when">19–25 окт.</td><td class="num hours">24–30 ч</td><td class="num cost">45 000 ₽</td></tr>
+          <tr><td>2. Разбор и оценка</td><td>Ведомость деревьев и оценка по каждой закупке</td><td class="when">26 окт. — 1 нояб.</td><td class="num hours">20–24 ч</td><td class="num cost">36 000 ₽</td></tr>
+          <tr><td>3. Черновики и сводка</td><td>Черновики КП, сводка к 9:00</td><td class="when">26 окт. — 1 нояб.</td><td class="num hours">13–16 ч</td><td class="num cost">24 000 ₽</td></tr>
+          <tr><td>4. Заказчики вне торгов</td><td>Карточки победителей, новостроек, ландшафтных компаний</td><td class="when">2–8 нояб.</td><td class="num hours">20–24 ч</td><td class="num cost">36 000 ₽</td></tr>
+          <tr><td>5. Работа агента</td><td>Сводки, донастройка, итоговый отчёт</td><td class="when">26 окт. — 17 нояб.</td><td class="num hours">14–16 ч + агент</td><td class="num cost">33 000 ₽</td></tr>
+          <tr class="total"><td>Итого</td><td>Пилот целиком</td><td class="when">19 окт. — 17 нояб.</td><td class="num hours">91–110 ч</td><td class="num cost">174 000 ₽</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p><strong>Урезанный вариант «Только торги»</strong> — этапы 1, 2, 3 и 5 без этапа 4: <strong>138 000 ₽</strong>. Этап 4 можно подключить позже за 36 000 ₽.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">5</span>После пилота</h2>
+    <ul>
+      <li><strong>Сопровождение — 30 000 ₽ в месяц.</strong> Агент работает каждый день. До 15 часов наших работ: донастройка оценки, новые породы и слова, починка при смене площадок. Отчёт раз в месяц.</li>
+      <li><strong>Только работа агента — 15 000 ₽ в месяц.</strong> Агент работает, чиним поломки источников (до 5 часов), короткий отчёт.</li>
+      <li><strong>Новый источник или регион — 9 000 ₽</strong> разово.</li>
+    </ul>
+    <p>Работа ИИ входит в стоимость, отдельных счетов за сервисы нет. Сверх лимита часов работаем только с вашего «ок». После пилота можно остановиться: сводки, карточки и отчёт остаются у вас.</p>
+  </section>
+
+  <section>
+    <h2><span class="n">6</span>Что остаётся за вами</h2>
+    <ul>
+      <li><strong>Таблица склада и прайс</strong> в первую неделю: порода, сорт, высота, ком, количество, цена, фото, документы о происхождении. Без неё агент не сверит заказ со складом. И бланк для КП.</li>
+      <li><strong>Электронная подпись руководителя</strong> для регистрации в ЕИС, на портале поставщиков Москвы и в ПИК ЕАСУЗ. Оферты и заявки подаёт ваш менеджер.</li>
+      <li><strong>Менеджер.</strong> По нашей оценке, 30–60 минут утром на сводку, плюс отправка КП и звонки. Котировочные сессии портала Москвы идут от 3 часов, поэтому на уведомление отвечать нужно в течение часа.</li>
+      <li><strong>Номер для звонков</strong> промаркировать у оператора: с 1 сентября 2025 года это обязательно для звонков от компаний, иначе звонок помечается как спам.</li>
+      <li><strong>Ваш юрист</strong> до 26 октября смотрит шаблон КП и сценарий звонка.</li>
+      <li><strong>Решения:</strong> цены, участвовать ли в закупке, договор, отгрузка.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">7</span>Чего не делаем</h2>
+    <ul>
+      <li>Не обещаем продаж и побед в торгах.</li>
+      <li>Не подаём заявки и ничего не подписываем от вашего имени.</li>
+      <li>Не рассылаем и не звоним: никаких массовых писем, SMS и роботов. Реклама по почте и телефону без согласия запрещена законом о рекламе, штраф для компании до 1 млн ₽. Каждое КП адресовано одной компании под её контракт или объект.</li>
+      <li>Не покупаем базы и не копируем 2ГИС, Яндекс Карты и hh.ru. Работаем только с открытыми официальными источниками.</li>
+      <li>Не передаём в ИИ данные людей. Программа на нашем сервере убирает ФИО, телефоны и почту до передачи в модель, контакты остаются в вашей CRM.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">8</span>Риски и как их закрываем</h2>
+    <div class="table-wrap">
+      <table class="risks">
+        <thead><tr><th>Риск</th><th>Что делаем</th></tr></thead>
+        <tbody>
+          <tr><td>Площадка поменяла вёрстку или закрыла доступ</td><td>Агент сообщает в тот же день, чиним в рамках пилота</td></tr>
+          <tr><td>ПИК ЕАСУЗ и B2B-Center показывают часть данных только после регистрации</td><td>Проверяем в первую неделю. Если доступа нет, источник в пилот не входит и не оплачивается</td></tr>
+          <tr><td>Таблица склада приходит позже</td><td>Сдвигаем этапы 2–5 на столько же дней, цена не меняется</td></tr>
+          <tr><td>К весне закупок становится больше</td><td>Поднимаем порог оценки, чтобы менеджер видел только лучшие</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="n">9</span>Условия</h2>
+    <ul>
+      <li>Работу начинаем после вашего «ок» на это предложение.</li>
+      <li>Оплата после сдачи каждого этапа, вместе с отчётом. Аванса нет, оплата не зависит от продаж.</li>
+      <li>В цене два круга правок. Наши ошибки исправляем бесплатно. Если часов уйдёт больше, цена не меняется.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2><span class="n">10</span>Следующий шаг</h2>
+    <p>Созвон на 20 минут в пятницу, 16 октября: подтверждаем пилот и формат таблицы склада. После вашего «ок» пришлём короткую анкету и стартуем в понедельник, 19 октября.</p>
+    <p class="sign"><span>Павел Воронин</span><span class="small">web2best.com</span></p>
+  </section>
+
+  <footer>web2best.com — разработка веб и мобильных решений · Предложение от 15.10.2026, действует 30 дней.</footer>
+</main>
+</body>
+</html>
